@@ -31,77 +31,11 @@ public class Main extends Application {
 		Image lipp_valge = new Image(new FileInputStream("pildid/lipp_valge.png"));
 		Image kuningas_valge = new Image(new FileInputStream("pildid/kuningas_valge.png"));
 
+		Image[] nupuPildid = {ettur_must, vanker_must, ratsu_must, oda_must, lipp_must, kuningas_must, ettur_valge,
+				vanker_valge, ratsu_valge, oda_valge, lipp_valge, kuningas_valge};
 
 
-		for (int r = 0; r < 8; r++) {
-			for (int c = 0; c < 8; c++) {
-
-				Button button = new Button();
-				button.setMinSize(100,100);
-				button.setMaxSize(100,100);
-				grid.add(button, c, r);
-				button.setStyle("-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px");
-
-				button.setOnMouseClicked(event -> {
-					if (!Objects.equals(button.getGraphic().getId(), "0")) {
-						if (button.getStyle().equals("-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px")) {
-							button.setStyle("-fx-background-color:#228B22; -fx-border-color: #000000; -fx-border-width: 2px");
-						} else {
-							button.setStyle("-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px");
-						}
-					}
-				});
-
-				ImageView imageView = new ImageView();
-				imageView.setId("0");
-
-
-
-				if (r == 1)
-					imageView = new ImageView(ettur_must);
-				if (r == 6)
-					imageView = new ImageView(ettur_valge);
-
-
-				if (r == 0){
-					if (c == 0 || c == 7)
-						imageView = new ImageView(vanker_must);
-					if (c == 1 || c == 6)
-						imageView = new ImageView(ratsu_must);
-					if (c == 2 || c == 5)
-						imageView = new ImageView(oda_must);
-					if (c == 3)
-						imageView = new ImageView(lipp_must);
-					if (c == 4)
-						imageView = new ImageView(kuningas_must);
-				}
-
-				if (r == 7){
-					if (c == 0 || c == 7)
-						imageView = new ImageView(vanker_valge);
-					if (c == 1 || c == 6)
-						imageView = new ImageView(ratsu_valge);
-					if (c == 2 || c == 5)
-						imageView = new ImageView(oda_valge);
-					if (c == 3)
-						imageView = new ImageView(lipp_valge);
-					if (c == 4)
-						imageView = new ImageView(kuningas_valge);
-				}
-
-
-				imageView.setFitHeight(100);
-				imageView.setFitWidth(100);
-				button.setGraphic(imageView);
-
-			}
-		}
-
-
-
-
-
-
+		Laud laud = new Laud(grid, nupuPildid);
 
 		ScrollPane scrollPane = new ScrollPane(grid);
 		stage.setScene(new Scene(scrollPane));
