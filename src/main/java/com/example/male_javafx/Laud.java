@@ -4,8 +4,6 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.stage.WindowEvent;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +22,7 @@ public class Laud {
 	 * Loob laua objekti
 	 *
 	 * @param grid	Alus, millele ruudustik luuakse
-	 * @throws IOException
+	 * @throws IOException Erind
 	 */
 	public Laud(GridPane grid) throws IOException {
 		Image ettur_must = new Image(new FileInputStream("pildid/ettur_must.png"));				// Laeb pildid sisse
@@ -93,15 +91,16 @@ public class Laud {
 	}
 
 	/**
-	 * Kui vajutada nupu peale, siis läheb
+	 * Kui vajutada nupu peale, siis läheb nupu taust roheliseks, kui uuesti selle peale vajutada, läheb tagasi.
+	 * Kui vajutada peale roheliseks tegemist sobiva käigu peale, siis see sooritatakse, ebasobivat ei lasta teha
 	 *
-	 * @param button
+	 * @param button Nupp
 	 */
 	public void nuppEvent(Button button){
 		String aktiveeritudStiil = "-fx-background-color:#228B22; -fx-border-color: #000000; -fx-border-width: 2px";
 		String tavaStiil = "-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px";
 
-		boolean mangijaNupp = false;
+		boolean mangijaNupp = false;					// Kontrollib, kas vajutatud nupp on mängija nupp
 		if (!aktiveeritud) {
 			for (Nupp nupp : kaiguTegija.getNupud()) {
 				if (nupp.getNimi().equals(button.getId())) {
@@ -111,13 +110,13 @@ public class Laud {
 			}
 		}
 
-		if (button.getStyle().equals(aktiveeritudStiil)){
+		if (button.getStyle().equals(aktiveeritudStiil)){	// Kui vajutatakse sama nuppu uuesti
 			button.setStyle(tavaStiil);
 			aktiveeritud = false;
 			return;
 		}
 
-		if (aktiveeritud){
+		if (aktiveeritud){									// Kui üritatakse käiku sooritada
 			int[] koord1 = leiaKooridnaadid(ajutine);
 			int[] koord2 = leiaKooridnaadid(button);
 
@@ -127,7 +126,7 @@ public class Laud {
 				laePildid();
 				ajutine.setStyle(tavaStiil);
 
-				boolean lopp = true;
+				boolean lopp = true;								// Kontrollib mängu lõppu
 				for (Nupp nupp : kaiguTegija.getNupud()) {
 					if (nupp.getNimi().equals("kuningasV") || nupp.getNimi().equals("kuningasM")){
 						lopp = false;
@@ -141,14 +140,19 @@ public class Laud {
 			return;
 		}
 
-		if (mangijaNupp) {
+		if (mangijaNupp) {							// Tehakse valitud nupp roheliseks
 			button.setStyle(aktiveeritudStiil);
 			aktiveeritud = true;
 			ajutine = button;
 		}
 	}
 
-
+	/**
+	 * Leiab nuputüübile vastava pildi
+	 *
+	 * @param tuup Nuputüüp
+	 * @return	Pilt
+	 */
 	public ImageView leiaPilt(String tuup){
 		ImageView imageView = new ImageView();
 		List<String> tuubid = Arrays.asList("etturM", "vankerM", "ratsuM", "odaM", "lippM", "kuningasM", "etturV",
@@ -166,8 +170,9 @@ public class Laud {
 	}
 
 
-
-
+	/**
+	 *	Loob uue mängulaua, mida kasutatkase kontrollimiskes.
+	 */
 	public void kaivitaMang() {
 		mangija1 = new Mangija();					// Luuakse mängijad
 		mangija2 = new Mangija();
@@ -184,6 +189,16 @@ public class Laud {
 		}
 	}
 
+
+	/**
+	 * Kontrollib, kas käik on sobilik
+	 *
+	 * @param algusRida	Nupu rida
+	 * @param algusVeerg Nuou veerg
+	 * @param loppRida	Sihtkoha rida
+	 * @param loppVeerg	Sihtkoha veerg
+	 * @return Kas käiku sai sooritada
+	 */
 	public boolean sooritaKaik(int algusRida, int algusVeerg, int loppRida, int loppVeerg){
 
 
@@ -209,6 +224,9 @@ public class Laud {
 		return true;
 	}
 
+	/**
+	 * Sünkroniseerib kontrollitava mängulaua selle mängulaua, mida mängija näeb
+	 */
 	public void sunkroniseeriLauad(){
 		for (int rida = 0; rida < 8; rida++) {
 			for (int veerg = 0; veerg < 8; veerg++) {
@@ -222,6 +240,12 @@ public class Laud {
 		laePildid();
 	}
 
+	/**
+	 * Leiab nupu kordinaadid ruudustikul
+	 *
+	 * @param button Nupp
+	 * @return Massiiv, kus on rida ja veerg
+	 */
 	public int[] leiaKooridnaadid(Button button){
 		for (int rida = 0; rida < 8; rida++)
 			for (int veerg = 0; veerg < 8; veerg++)
@@ -231,12 +255,15 @@ public class Laud {
 		return null;
 	}
 
-
-	public void closeWindowEvent(WindowEvent event) throws IOException {
+	/**
+	 * Mängu sulgemisel salvestab seisu
+	 *
+	 * @throws IOException	Erind
+	 */
+	public void closeWindowEvent() throws IOException {
 		try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("logi.dat"))){
 
 			dos.writeBoolean(true);
-
 
 
 			for (int i = 0; i < 8; i++) {
@@ -267,11 +294,16 @@ public class Laud {
 		}
 	}
 
-
+	/**
+	 * Loeb eelmise mängu seisu sisse
+	 *
+	 * @return	Kas eelmine mäng leiti
+	 * @throws IOException	Erind
+	 */
 	public boolean loeSisse() throws IOException {
 		try (DataInputStream dis = new DataInputStream(new FileInputStream("logi.dat"))){
 
-			if (!dis.readBoolean())
+			if (!dis.readBoolean())		// Peab järge, kas andmeid on või ei ole
 				return false;
 
 

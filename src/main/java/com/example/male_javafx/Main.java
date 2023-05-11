@@ -32,9 +32,6 @@ public class Main extends Application {
 		}
 
 
-		sulge.setOnMouseClicked(event -> {
-			System.exit(0);
-		});
 
 		ColumnConstraints veerg = new ColumnConstraints();		// Kannab hoolt, et akent saaks korralikult suurendada
 		veerg.setPercentWidth(12.5);
@@ -66,7 +63,7 @@ public class Main extends Application {
 
 		scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event1 -> {		// Salvestab mängu sulgemisel laua seisu
 			try {
-				mangulaud.closeWindowEvent(event1);
+				mangulaud.closeWindowEvent();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -84,13 +81,15 @@ public class Main extends Application {
 			stage.setScene(manguStseen);
 		});
 
+		sulge.setOnMouseClicked(event -> System.exit(0));
+
 	}
 
 	/**
 	 * Loob uue mängu
 	 *
 	 * @param stage	Aken, kuhu mäng luuakse
-	 * @throws IOException
+	 * @throws IOException Erind
 	 */
 	public static void looUus(Stage stage) throws IOException {
 		try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("logi.dat"))){
@@ -118,7 +117,7 @@ public class Main extends Application {
 
 		manguStseen.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, event1 -> {
 			try {
-				mangulaud.closeWindowEvent(event1);
+				mangulaud.closeWindowEvent();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
