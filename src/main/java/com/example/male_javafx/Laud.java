@@ -70,7 +70,13 @@ public class Laud {
 				button.setPrefSize(100, 100);
 				button.setMaxSize(Integer.MAX_VALUE,Integer.MAX_VALUE);
 				button.setStyle(tavaStiil);
-				button.setOnMouseClicked(event -> nuppEvent(button));
+				button.setOnMouseClicked(event -> {
+					try {
+						nuppEvent(button);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				});
 				grid.add(button, veerg, rida);
 				mangulaudNupud[rida][veerg] = button;
 
@@ -96,7 +102,7 @@ public class Laud {
 	 *
 	 * @param button Nupp
 	 */
-	public void nuppEvent(Button button){
+	public void nuppEvent(Button button) throws IOException {
 		String aktiveeritudStiil = "-fx-background-color:#228B22; -fx-border-color: #000000; -fx-border-width: 2px";
 		String tavaStiil = "-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px";
 
@@ -134,8 +140,12 @@ public class Laud {
 					}
 				}
 
-				if (lopp)
+				if (lopp) {
+					try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("logi.dat"))){
+						dos.writeBoolean(false);	// Kustutab andmed
+					}
 					System.exit(0);
+				}
 			}
 			return;
 		}
