@@ -1,5 +1,6 @@
 package com.example.male_javafx;
 
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -75,6 +76,16 @@ public class Laud {
 		String aktiveeritudStiil = "-fx-background-color:#228B22; -fx-border-color: #000000; -fx-border-width: 2px";
 		String tavaStiil = "-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px";
 
+		boolean mangijaNupp = false;
+		if (!aktiveeritud) {
+			for (Nupp nupp : kaiguTegija.getNupud()) {
+				if (nupp.getNimi().equals(button.getId())) {
+					mangijaNupp = true;
+					break;
+				}
+			}
+		}
+
 		if (button.getStyle().equals(aktiveeritudStiil)){
 			button.setStyle(tavaStiil);
 			aktiveeritud = false;
@@ -89,11 +100,21 @@ public class Laud {
 				aktiveeritud = false;
 				laePildid();
 				ajutine.setStyle(tavaStiil);
+
+				boolean lopp = true;
+				for (Nupp nupp : kaiguTegija.getNupud()) {
+					if (nupp.getNimi().equals("kuningasV") || nupp.getNimi().equals("kuningasM")){
+						lopp = false;
+					}
+				}
+
+				if (lopp)
+					System.exit(0);
 			}
 			return;
 		}
 
-		if (!Objects.equals(button.getId(), "0")) {
+		if (mangijaNupp) {
 			button.setStyle(aktiveeritudStiil);
 			aktiveeritud = true;
 			ajutine = button;
