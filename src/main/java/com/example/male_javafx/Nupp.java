@@ -24,6 +24,15 @@ public class Nupp {
 		this.asukohty = asukohty;
 	}
 
+	public Nupp(String nimi, char varv, int asukohty, int asukohtx, boolean enPassant, boolean kasPoleLiikunud) {
+		this.nimi = nimi;
+		this.varv = varv;
+		this.asukohty = asukohty;
+		this.asukohtx = asukohtx;
+		this.enPassant = enPassant;
+		this.kasPoleLiikunud = kasPoleLiikunud;
+	}
+
 	public String getNimi() {
 		return nimi;
 	}

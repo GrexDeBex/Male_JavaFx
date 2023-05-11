@@ -1,28 +1,33 @@
 package com.example.male_javafx;
 
-import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import javafx.stage.WindowEvent;
+
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
 
 public class Laud {
-	private boolean aktiveeritud;
-	private final GridPane grid;
-	private final Image[] nupuPildid;
-	private Button[][] mangulaudNupud;
-	private Button ajutine;
+	private boolean aktiveeritud;		// Kontrollib, kas mõni ruut on hetkel roheline
+	private final GridPane grid;		// Mängulaua alus
+	private final Image[] nupuPildid;	// Kõigi nuppude pildid
+	private Button[][] mangulaudNupud;	// Kõigi kastide massiiv
+	private Button ajutine;				// Jätab meelde, milline nupp on hetkel aktiveeritud
 	private Mangija mangija1, mangija2, kaiguTegija, vastane;
-	private Mangulaud mangulaud;
+	private Mangulaud mangulaud;		// Käikude kontrollimiseks male massiiv
 
-	public Laud(GridPane grid) throws FileNotFoundException {
-		Image ettur_must = new Image(new FileInputStream("pildid/ettur_must.png"));
+	/**
+	 * Loob laua objekti
+	 *
+	 * @param grid	Alus, millele ruudustik luuakse
+	 * @throws IOException
+	 */
+	public Laud(GridPane grid) throws IOException {
+		Image ettur_must = new Image(new FileInputStream("pildid/ettur_must.png"));				// Laeb pildid sisse
 		Image vanker_must = new Image(new FileInputStream("pildid/vanker_must.png"));
 		Image ratsu_must = new Image(new FileInputStream("pildid/ratsu_must.png"));
 		Image oda_must = new Image(new FileInputStream("pildid/oda_must.png"));
@@ -40,11 +45,21 @@ public class Laud {
 		this.nupuPildid = new Image[]{ettur_must, vanker_must, ratsu_must, oda_must, lipp_must, kuningas_must,
 				ettur_valge, vanker_valge, ratsu_valge, oda_valge, lipp_valge, kuningas_valge};
 
-		genereeri();
-		kaivitaMang();
+		try {
+			if (!loeSisse())					// Kontrollib, kas on olemas eelmise mängu andmed
+				kaivitaMang();					// Kui ei ole, siis luuakse uus mäng
+		}catch (FileNotFoundException e){
+			kaivitaMang();
+		}
+
+		genereeriRuudustik();	// Loob ruudustiku
 	}
 
-	public void genereeri(){
+	/**
+	 * Loob nähtava maleruudustiku
+	 *
+	 */
+	public void genereeriRuudustik(){
 
 		String tavaStiil = "-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px";
 		mangulaudNupud = new Button[8][8];
@@ -54,16 +69,21 @@ public class Laud {
 
 				Button button = new Button();
 				button.setMinSize(100,100);
+				button.setPrefSize(100, 100);
+				button.setMaxSize(Integer.MAX_VALUE,Integer.MAX_VALUE);
 				button.setStyle(tavaStiil);
 				button.setOnMouseClicked(event -> nuppEvent(button));
-				button.setId(nupuTuup(rida, veerg));
 				grid.add(button, veerg, rida);
 				mangulaudNupud[rida][veerg] = button;
+
 			}
 		}
-		laePildid();
+		sunkroniseeriLauad();	// viib arvti kontroll lauaga nähtava malelaua kooskõlasse
 	}
 
+	/**
+	 * Paigutab igale ruudule vastava pildi
+	 */
 	public void laePildid(){
 		for (Button[] rida : mangulaudNupud) {
 			for (Button nupp : rida) {
@@ -72,6 +92,11 @@ public class Laud {
 		}
 	}
 
+	/**
+	 * Kui vajutada nupu peale, siis läheb
+	 *
+	 * @param button
+	 */
 	public void nuppEvent(Button button){
 		String aktiveeritudStiil = "-fx-background-color:#228B22; -fx-border-color: #000000; -fx-border-width: 2px";
 		String tavaStiil = "-fx-background-color:#CD7F32; -fx-border-color: #000000; -fx-border-width: 2px";
@@ -97,6 +122,7 @@ public class Laud {
 			int[] koord2 = leiaKooridnaadid(button);
 
 			if (sooritaKaik(koord1[0], koord1[1], koord2[0], koord2[1])){
+
 				aktiveeritud = false;
 				laePildid();
 				ajutine.setStyle(tavaStiil);
@@ -105,6 +131,7 @@ public class Laud {
 				for (Nupp nupp : kaiguTegija.getNupud()) {
 					if (nupp.getNimi().equals("kuningasV") || nupp.getNimi().equals("kuningasM")){
 						lopp = false;
+						break;
 					}
 				}
 
@@ -138,40 +165,7 @@ public class Laud {
 		return imageView;
 	}
 
-	public String nupuTuup(int rida, int veerg) {
-		if (rida == 1)
-			return "etturM";
-		if (rida == 6)
-			return "etturV";
 
-		if (rida == 0){
-			if (veerg == 0 || veerg == 7)
-				return "vankerM";
-			if (veerg == 1 || veerg == 6)
-				return "ratsuM";
-			if (veerg == 2 || veerg == 5)
-				return "odaM";
-			if (veerg == 3)
-				return "lippM";
-			if (veerg == 4)
-				return "kuningasM";
-		}
-
-		if (rida == 7){
-			if (veerg == 0 || veerg == 7)
-				return "vankerV";
-			if (veerg == 1 || veerg == 6)
-				return "ratsuV";
-			if (veerg == 2 || veerg == 5)
-				return "odaV";
-			if (veerg == 3)
-				return "lippV";
-			if (veerg == 4)
-				return "kuningasV";
-		}
-
-		return "0";
-	}
 
 
 	public void kaivitaMang() {
@@ -192,13 +186,15 @@ public class Laud {
 
 	public boolean sooritaKaik(int algusRida, int algusVeerg, int loppRida, int loppVeerg){
 
+
 		Nupp valitudNupp = mangulaud.getLaud()[algusRida][algusVeerg];
 		if (!kaiguTegija.getNupud().contains(valitudNupp))
 			return false;
 
+
+
 		if (!KaiguKontroll.kontroll(valitudNupp, loppRida, loppVeerg, mangulaud.getLaud(), vastane))
 			return false;
-
 
 		if (kaiguTegija == mangija1) {				// Määrab, kelle kord on järgmine käik teha
 			kaiguTegija = mangija2;
@@ -208,6 +204,12 @@ public class Laud {
 			vastane = mangija2;
 		}
 
+		sunkroniseeriLauad();
+
+		return true;
+	}
+
+	public void sunkroniseeriLauad(){
 		for (int rida = 0; rida < 8; rida++) {
 			for (int veerg = 0; veerg < 8; veerg++) {
 				Nupp nupp = mangulaud.getLaud()[rida][veerg];
@@ -217,8 +219,7 @@ public class Laud {
 					mangulaudNupud[rida][veerg].setId("0");
 			}
 		}
-
-		return true;
+		laePildid();
 	}
 
 	public int[] leiaKooridnaadid(Button button){
@@ -228,5 +229,87 @@ public class Laud {
 					return new int[]{rida, veerg};
 
 		return null;
+	}
+
+
+	public void closeWindowEvent(WindowEvent event) throws IOException {
+		try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("logi.dat"))){
+
+			dos.writeBoolean(true);
+
+
+
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					if (mangulaud.getLaud()[i][j] != null)
+						dos.writeBoolean(true);
+					else {
+						dos.writeBoolean(false);
+						continue;
+					}
+
+					Nupp nupp = mangulaud.getLaud()[i][j];
+					dos.writeUTF(nupp.getNimi());
+					dos.writeChar(nupp.getVarv());
+					dos.writeInt(nupp.getAsukohty());
+					dos.writeInt(nupp.getAsukohtx());
+					dos.writeBoolean(nupp.isEnPassant());
+					dos.writeBoolean(nupp.kasPoleLiikunud());
+				}
+			}
+
+			if (kaiguTegija.equals(mangija1)) {
+				dos.writeInt(1);
+			} else {
+				dos.writeInt(2);
+			}
+
+		}
+	}
+
+
+	public boolean loeSisse() throws IOException {
+		try (DataInputStream dis = new DataInputStream(new FileInputStream("logi.dat"))){
+
+			if (!dis.readBoolean())
+				return false;
+
+
+
+			Nupp[][] tabel = new Nupp[8][8];
+			ArrayList<Nupp> mangijaNupudValge = new ArrayList<>();
+			ArrayList<Nupp> mangijaNupudMust = new ArrayList<>();
+
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					if (!dis.readBoolean())
+						continue;
+
+
+					Nupp nupp = new Nupp(dis.readUTF(), dis.readChar(), dis.readInt(), dis.readInt(), dis.readBoolean(), dis.readBoolean());
+					tabel[i][j] = nupp;
+
+					if (nupp.getVarv() == 'v')
+						mangijaNupudValge.add(nupp);
+					else
+						mangijaNupudMust.add(nupp);
+				}
+			}
+
+
+			this.mangulaud = new Mangulaud(tabel);
+			this.mangija1 = new Mangija('v', mangijaNupudValge);
+			this.mangija2 = new Mangija('m', mangijaNupudMust);
+
+			if (dis.readInt() == 1){
+				this.kaiguTegija = mangija1;
+				this.vastane = mangija2;
+			}else {
+				this.kaiguTegija = mangija2;
+				this.vastane = mangija1;
+			}
+		}
+
+		return true;
 	}
 }

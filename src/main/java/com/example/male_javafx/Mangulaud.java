@@ -18,6 +18,10 @@ public class Mangulaud {
 		this.laud = laud;
 	}
 
+	public Mangulaud(Nupp[][] laud) {
+		this.laud = laud;
+	}
+
 	public Nupp[][] getLaud() {
 		return laud;
 	}

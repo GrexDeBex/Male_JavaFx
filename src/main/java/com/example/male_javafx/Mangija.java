@@ -15,6 +15,11 @@ public class Mangija {
 		this.nupud = new ArrayList<>();
 	}
 
+	public Mangija(char varv, ArrayList<Nupp> nupud) {
+		this.varv = varv;
+		this.nupud = nupud;
+	}
+
 	public char getVarv() {
 		return varv;
 	}
@@ -35,14 +40,7 @@ public class Mangija {
 	 * @param mangija2 Teine mängija
 	 */
 	public static void seaMängijateVärvid(Mangija mangija1, Mangija mangija2) {
-		if (Math.random() < 0.50) {
-			mangija1.setVarv('m');
-			mangija2.setVarv('v');
-		} else {
-			mangija1.setVarv('v');
-			mangija2.setVarv('m');
-		}
-
-
+		mangija1.setVarv('v');
+		mangija2.setVarv('m');
 	}
 }

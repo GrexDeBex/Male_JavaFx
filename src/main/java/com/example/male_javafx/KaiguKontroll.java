@@ -4,6 +4,8 @@ package com.example.male_javafx; /**
  * Klass sisaldab kõiki käigu sooritamise kontrollide funktsioone
  */
 
+import javafx.scene.control.TextInputDialog;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -157,6 +159,7 @@ public class KaiguKontroll {
 				}
 			}
 		}
+
 		return false;
 	}
 
@@ -171,37 +174,27 @@ public class KaiguKontroll {
 		String sisend;
 
 		if (rida == 0 || rida == 7) {        // Kui ettur on viimasel real
-
-			while (true) {                    // Küsib vastaselt sisendit
-				System.out.println("Vali nupp (vanker, ratsu, oda, lipp):");
-				Scanner sc = new Scanner(System.in);
-				sisend = sc.nextLine();
-				ArrayList<String> valikud = new ArrayList<>(Arrays.asList("vanker", "ratsu", "oda", "lipp"));
-				if (valikud.contains(sisend)) {
+			while (true){
+				try{
+					ArrayList<String> valikud = new ArrayList<>(Arrays.asList("vanker", "ratsu", "oda", "lipp"));
+					TextInputDialog dialog = new TextInputDialog();
+					dialog.setContentText("Vali nupp (vanker, ratsu, oda, lipp):");
+					do {                    // Küsib mängijalt sisendit
+						sisend = dialog.showAndWait().get();
+						System.out.println(sisend);
+					} while (!valikud.contains(sisend));
 					break;
+				}catch (RuntimeException e){
+					System.out.println(e.getMessage());
 				}
-				System.out.println("Vale sisend!!!");
 			}
 
 
-			for (int i = 0; i < 10; i++) {        // Otsib nupule sobivat indeksit, millega seda kuvada
-				boolean sobivNimi = true;
-				for (Nupp[] nupud : laud) {
-					for (Nupp nupp1 : nupud) {
-						if (nupp1 == null){
-							continue;
-						}
-						if (nupp1.getNimi().equals(sisend + i)) {        // Kontrollib, et sama nimega nuppu juba ei oleks
-							sobivNimi = false;
-							break;
-						}
-					}
-				}
 
-				if (sobivNimi) {
-					nupp.setNimi(sisend + i);
-					break;
-				}
+			if (nupp.getVarv() == 'v'){
+				nupp.setNimi(sisend + 'V');
+			}else {
+				nupp.setNimi(sisend + 'M');
 			}
 		}
 	}
@@ -268,6 +261,7 @@ public class KaiguKontroll {
 		int veeruSuund = 0;                                        // Kontrollimissuund
 		int reaSuund = 1;
 
+
 		for (int i = 0; i < 8; i++) {                                        // Kontrollib kõiki kuninga käike
 			if (rida == kontrollitavRida && veerg == kontrollitavVeerg) {        // Kuninga liikumine on ruut ehk kontrollitakse mööda ruutu
 				return ruuduKontroll(nupp, rida, veerg, laud, vastane);
@@ -311,7 +305,7 @@ public class KaiguKontroll {
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
